@@ -1,0 +1,3 @@
+@Admin
+public class UserService {
+}
