@@ -3,9 +3,10 @@ package core.selector;
 import core.registry.MeaningRegistry;
 import core.view.TypeMeaningView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 public final class MeaningSelector {
 
@@ -15,31 +16,13 @@ public final class MeaningSelector {
         this.registry = Objects.requireNonNull(registry);
     }
 
-    public List<TypeMeaningView> selectAll() {
-        return registry.views()
-                .stream()
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    public List<TypeMeaningView> selectByStereotype(String stereotype) {
-        return registry.views()
-                .stream()
-                .filter(v -> v.stereotypes().contains(stereotype))
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    public List<TypeMeaningView> selectByTag(String tag) {
-        return registry.views()
-                .stream()
-                .filter(v -> v.tagValue().isPresent())
-                .filter(v -> v.tagValue().get().equals(tag))
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    public List<TypeMeaningView> selectByAnnotation(Class<?> annotationType) {
-        return registry.views()
-                .stream()
-                .filter(v -> v.hasAnnotation(annotationType.asSubclass(java.lang.annotation.Annotation.class)))
-                .collect(Collectors.toUnmodifiableList());
+    public List<TypeMeaningView> select(Predicate<TypeMeaningView> filter) {
+        List<TypeMeaningView> result = new ArrayList<>();
+        for (TypeMeaningView view : registry.all()) {
+            if (filter.test(view)) {
+                result.add(view);
+            }
+        }
+        return result;
     }
 }
